@@ -90,53 +90,7 @@ import java.util.ResourceBundle;
  */
 public class JSONObject {
 
-    /**
-     * JSONObject.NULL is equivalent to the value that JavaScript calls null,
-     * whilst Java's null is equivalent to the value that JavaScript calls
-     * undefined.
-     */
-     private static final class Null {
-
-        /**
-         * There is only intended to be a single instance of the NULL object,
-         * so the clone method returns itself.
-         * @return     NULL.
-         */
-        protected final Object clone() {
-            return this;
-        }
-
-        /**
-         * A Null object is equal to the null value and to itself.
-         * @param object    An object to test for nullness.
-         * @return true if the object parameter is the JSONObject.NULL object
-         *  or null.
-         */
-        @Override
-        public boolean equals(Object object) {
-            if(! (object instanceof JSONObject)) {
-                return false;
-            } else {
-                return object == null || object == this;
-            }
-        }
-
-        /**
-         * Get the "null" string value.
-         * @return The string "null".
-         */
-        @Override
-        public String toString() {
-            return "null";
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 3;
-            return hash;
-        }
-    }
-
+    
 
     /**
      * The map where the JSONObject's properties are kept.
@@ -150,7 +104,7 @@ public class JSONObject {
      * <code>JSONObject.NULL.equals(null)</code> returns <code>true</code>.
      * <code>JSONObject.NULL.toString()</code> returns <code>"null"</code>.
      */
-    public static final Object NULL = new Null();
+    public static final Object NULL = null;
 
 
     /**
