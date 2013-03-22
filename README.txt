@@ -1,3 +1,9 @@
+Belly - Added Timestamp parsing to JsonStructObjectInspector.java
+
+If a timestamp (yyyy-MM-dd HH:mm:ss.SSSSSS) is detected from a string via Regex,
+it will convert its output to a java.sql.Timestamp object.  This may lead to 
+unexpected results for tables that store timestamps as strings.
+
 JsonSerde - a read/write SerDe for JSON Data
 AUTHOR: Roberto Congiu <rcongiu@yahoo.com>
 

@@ -18,20 +18,23 @@ import org.apache.hadoop.hive.serde2.objectinspector.StandardStructObjectInspect
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.openx.data.jsonserde.json.JSONException;
 import org.openx.data.jsonserde.json.JSONObject;
+import java.text.SimpleDateFormat;
+import java.sql.Timestamp;
+import java.text.ParseException;
 
 /**
  * This Object Inspector is used to look into a JSonObject object.
- * We couldn't use StandardStructObjectInspector since that expects 
+ * We couldn't use StandardStructObjectInspector since that expects
  * something that can be cast to an Array<Object>.
  * @author rcongiu
  */
 public class JsonStructObjectInspector extends StandardStructObjectInspector {
-
+    
     public JsonStructObjectInspector(List<String> structFieldNames,
-            List<ObjectInspector> structFieldObjectInspectors) {
+                                     List<ObjectInspector> structFieldObjectInspectors) {
         super(structFieldNames, structFieldObjectInspectors);
     }
-
+    
     @Override
     public Object getStructFieldData(Object data, StructField fieldRef) {
         if (data == null) {
@@ -39,15 +42,22 @@ public class JsonStructObjectInspector extends StandardStructObjectInspector {
         }
         JSONObject obj = (JSONObject) data;
         MyField f = (MyField) fieldRef;
-
+        
         int fieldID = f.getFieldID();
         assert (fieldID >= 0 && fieldID < fields.size());
-
+        
         try {
             if(obj.has(f.getFieldName())) {
-               return obj.get(f.getFieldName());
+                final Object returnObj = obj.get(f.getFieldName());
+                if(returnObj instanceof String) {
+                    final String potentialTimstampString = (String)returnObj;
+                    if(potentialTimstampString.matches("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{9}$")) {
+                        return Timestamp.valueOf(potentialTimstampString);
+                    }
+                }
+                return returnObj;
             } else {
-               return null;
+                return null;
             }
         } catch (JSONException ex) {
             // if key does not exist
@@ -55,12 +65,12 @@ public class JsonStructObjectInspector extends StandardStructObjectInspector {
         }
     }
     static List<Object> values = new ArrayList<Object>();
-
+    
     @Override
     public List<Object> getStructFieldsDataAsList(Object o) {
         JSONObject jObj = (JSONObject) o;
         values.clear();
-
+        
         for (int i = 0; i < fields.size(); i++) {
             try {
                 if (jObj.has(fields.get(i).getFieldName())){
@@ -69,12 +79,12 @@ public class JsonStructObjectInspector extends StandardStructObjectInspector {
                     values.add(null);
                 }
             } catch (JSONException ex) {
-                // we're iterating through the keys so 
+                // we're iterating through the keys so
                 // this should never happen
                 return null;
             }
         }
-
+        
         return values;
     }
 }
